@@ -23,30 +23,34 @@ $(function() {
         var data = snapshot.val();
 
 		// Using jQuery, create a new img element with the URL of your data
-        var img = $('img').attr('src', data.url);
+        var img = $('<img>', { class: 'uploads', src: data.url });
 
 		// Append your img to your element with id photos
         $('#photos').append(img);
     });
 
 	// Reading Data: Form submission
-    
-    // Get the file
-    var uploadedFile = $('#file-upload')[0].files[0];
+    $('form').on('submit', function(event){
+        event.preventDefault();
+        
+        // Get the file
+        var uploadedFile = $('#file-upload')[0].files[0];
+        // Create a reference on Firebase storage using the filename
+        var uploadRef = storage.ref(uploadedFile.name);
 
-    // Create a reference on Firebase storage using the filename
-    var uploadRef = storage.ref(uploadedFile);
-    
-    // Put a file in the specified location, then...
-    fileRef.put(uploadedFile).then(function(){
+        // Put a file in the specified location, then...
+        uploadRef.put(uploadedFile).then(function(){
+            // Get the download URL from the reference, then...
+            uploadRef.getDownloadURL().then(function(url){
+                // Push the URL as a new child into your data structure
+                photosRef.push({ url: url });
+            });
+        });
         
-        
+        this.reset('form');
         
     });
-
     
-
-        // Get the download URL from the reference, then...
-
-            // Push the URL as a new child into your data structure
+    
+        
 })
